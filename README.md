@@ -5,4 +5,4 @@ basic android to-do app
 - remove items
 - mark items as completed
 
-https://cldup.com/zMCxq7Ad_1.gif
+![alt demo](https://cldup.com/zMCxq7Ad_1.gif)
