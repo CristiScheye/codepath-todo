@@ -1,8 +1,9 @@
 # codepath-todo
 basic android to-do app
 
-- add items
+Current Functionality:
+- add basic text items
 - remove items
-- mark items as completed
+- edit text of an item
 
-![alt demo](https://cldup.com/zMCxq7Ad_1.gif)
+![alt demo](https://cloudup.com/cQkAbrU9JII)
