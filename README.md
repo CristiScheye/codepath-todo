@@ -6,4 +6,4 @@ Current Functionality:
 - remove items
 - edit text of an item
 
-![alt demo](https://cloudup.com/cQkAbrU9JII)
+![alt demo](https://cldup.com/ewYpSjhONY.gif)
