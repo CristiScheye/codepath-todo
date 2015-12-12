@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">SimpleToDo</string>
     <string name="action_settings">Settings</string>
-    <string name="new_todo_label">Add Item</string>
-    <string name="task_input_label">New Task...</string>
+    <string name="new_todo_btn_label">Add Item</string>
+    <string name="task_input_label">New Item</string>
+    <string name="title_activity_edit_item">EditItemActivity</string>
+    <string name="edit_item_label">Edit item:</string>
+    <string name="edit_item_btn_label">Save Item</string>
 </resources>

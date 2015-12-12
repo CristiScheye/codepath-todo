@@ -1,5 +1,7 @@
 package com.cristischeye.simpletodo;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,12 +24,12 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<TodoItem> items;
-    ArrayAdapter<TodoItem> itemsAdapter;
-    ArrayList<Boolean> itemsChecked;
+    ArrayList<String> items;
+    ArrayAdapter<String> itemsAdapter;
     ListView lvItems;
     EditText etNewItem;
     Toolbar toolbar;
+    private final int EDIT_ITEM_REQUEST = 1;
 
 
     @Override
@@ -46,17 +48,15 @@ public class MainActivity extends AppCompatActivity {
 
         lvItems = (ListView) findViewById(R.id.lvItems);
         lvItems.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        itemsAdapter = new ArrayAdapter<TodoItem>(this, android.R.layout.simple_list_item_multiple_choice, items);
+        itemsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
         lvItems.setAdapter(itemsAdapter);
-        checkItems();
 
         setupViewListeners();
     }
 
     public void onAddItem(View view) {
         String newItem = etNewItem.getText().toString();
-        TodoItem newTodoItem = new TodoItem(newItem, false);
-        itemsAdapter.add(newTodoItem);
+        itemsAdapter.add(newItem);
         etNewItem.setText("");
         writeItems();
     }
@@ -68,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
                     public boolean onItemLongClick(AdapterView<?> adapter, View itemView, int pos, long id) {
                         items.remove(pos);
                         itemsAdapter.notifyDataSetChanged();
-                        checkItems();
                         writeItems();
                         return true;
                     }
@@ -79,13 +78,32 @@ public class MainActivity extends AppCompatActivity {
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                        TodoItem item = items.get(pos);
-                        item.toggleIsCompleted();
-                        lvItems.setItemChecked(pos, item.getIsCompleted());
-                        writeItems();
+                        editItem(pos);
                     }
                 }
         );
+    }
+
+    private void editItem(int position) {
+        Intent i = new Intent(this, EditItemActivity.class);
+        String item = items.get(position);
+
+        i.putExtra("position", position);
+        i.putExtra("originalText", item);
+
+        startActivityForResult(i, EDIT_ITEM_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == EDIT_ITEM_REQUEST && resultCode == RESULT_OK) {
+            String itemText = data.getExtras().getString("editedItemText");
+            int position = data.getExtras().getInt("position");
+
+            items.set(position, itemText);
+            itemsAdapter.notifyDataSetChanged();
+            writeItems();
+        }
     }
 
     private void readItems() {
@@ -93,15 +111,10 @@ public class MainActivity extends AppCompatActivity {
         File todoFile = new File(filesDir, "todo.txt");
 
         try {
-            ArrayList<String> itemStrings = new ArrayList<String>(FileUtils.readLines(todoFile));
-            items = new ArrayList<TodoItem>();
-            for (String itemString: itemStrings) {
-                TodoItem newTodo = new TodoItem(itemString.substring(1), itemString.startsWith("c"));
-                items.add(newTodo);
-            }
+            items = new ArrayList<String>(FileUtils.readLines(todoFile));
         }
         catch (IOException e){
-            items = new ArrayList<TodoItem>();
+            items = new ArrayList<String>();
         }
     }
 
@@ -110,24 +123,11 @@ public class MainActivity extends AppCompatActivity {
         File todoFile = new File(filesDir, "todo.txt");
 
         try {
-            FileUtils.writeLines(todoFile, getItemStrings());
+            FileUtils.writeLines(todoFile, items);
         }
         catch (IOException e){
             e.printStackTrace();
         }
     }
 
-    private ArrayList<String> getItemStrings() {
-        ArrayList<String> itemStrings = new ArrayList<String>();
-        for (TodoItem item: items) {
-            itemStrings.add(item.toFileString());
-        }
-        return itemStrings;
-    }
-
-    private void checkItems() {
-        for (int i = 0; i < items.size(); i++) {
-            lvItems.setItemChecked(i, items.get(i).getIsCompleted());
-        }
-    }
 }
